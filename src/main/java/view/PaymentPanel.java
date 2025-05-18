@@ -43,7 +43,7 @@ public class PaymentPanel extends JPanel {
         backButton.setContentAreaFilled(false);
         backButton.setForeground(FlightBookingApp.PRIMARY_COLOR);
         backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        backButton.addActionListener(e -> app.navigateTo("seatSelection"));
+        backButton.addActionListener(_ -> app.navigateTo("seatSelection"));
         headerPanel.add(backButton, BorderLayout.EAST);
         
         add(headerPanel, BorderLayout.NORTH);
@@ -68,7 +68,7 @@ public class PaymentPanel extends JPanel {
         
         JButton payButton = new JButton("Complete Payment");
         payButton.setBackground(FlightBookingApp.PRIMARY_COLOR);
-        payButton.setForeground(Color.WHITE);
+        payButton.setForeground(Color.black);
         payButton.setFont(new Font("Arial", Font.BOLD, 14));
         payButton.setFocusPainted(false);
         payButton.addActionListener(e -> processPayment());
@@ -383,13 +383,15 @@ public class PaymentPanel extends JPanel {
             // Create payment
             Payment payment = new Payment(totalAmount,(PaymentMethod) paymentMethodCombo.getSelectedItem(),new java.sql.Date(System.currentTimeMillis()));
             payment.setUserId(app.getCurrentUser().getId());
+            payment.setPaymentState(PaymentStatus.COMPLETED);
+            payment.setPaymentAmount(totalAmount);
             // Save payment
             payment.save();
             
             // Store in app for confirmation page
             app.setCurrentReservation(reservation);
             app.setCurrentPayment(payment);
-            
+            app.createReservation();
             // Show success message
             JOptionPane.showMessageDialog(this,
                 "Payment processed successfully!",
@@ -397,7 +399,7 @@ public class PaymentPanel extends JPanel {
                 JOptionPane.INFORMATION_MESSAGE);
                 
             // Navigate to confirmation page
-            app.navigateTo("confirmation");
+            app.navigateTo("search");
             
         } catch (Exception e) {
             e.printStackTrace();

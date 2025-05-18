@@ -123,11 +123,8 @@ public class User {
                     
                     return user;
                 } else {
-                  return null;
+                    throw new SQLException("User not found");
                 }
-            }catch (SQLException e) {
-                e.printStackTrace();
-                throw e;
             }
         }
     }

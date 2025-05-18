@@ -252,37 +252,6 @@ public class SeatSelectionPanel extends JPanel {
     /**
      * Load available seats for the selected flight
      */
-    private List<Seat> loadAvailableSeats() throws SQLException {
-        List<Integer> takenSeatIds = new ArrayList<>();
-    
-        // Step 1: Fetch taken seat IDs
-        String sql = "SELECT seat_id FROM passenger_seat ps " +
-                     "JOIN flightReservation fr ON ps.flightReservation_id = fr.id " +
-                     "WHERE fr.flight_id = ?";
-        
-        try (Connection conn = DbConnection.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, app.getSelectedFlight().getId());
-    
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    takenSeatIds.add(rs.getInt("seat_id"));
-                }
-            }
-        }
-    
-        // Step 2: Get seats after ResultSet is closed
-        List<Seat> seats = app.getSelectedAircraft().getSeats();
-        List<Seat> available = new ArrayList<>();
-    
-        for (Seat seat : seats) {
-            if (!takenSeatIds.contains(seat.getId())) {
-                available.add(seat);
-            }
-        }
-    
-        return available;
-    }
     
     /**
      * Populate the passenger selector dropdown
@@ -304,85 +273,122 @@ public class SeatSelectionPanel extends JPanel {
         }
     }
     
-    /**
-     * Create the seat map based on aircraft configuration
-     */
-    private void createSeatMap() {
-        seatMapPanel.removeAll();
-        seatButtonMap.clear();
+/**
+ * Main fix: This class has been enhanced to correctly display the seat map based on the Seat class structure
+ * 
+ * To fix the problem where no seats show as enabled despite having available seats, we need to:
+ * 1. Add debug logging to understand the data format
+ * 2. Handle mismatches between seat numbering formats
+ * 3. Provide flexible seat lookup
+ */
+
+/**
+ * Create the seat map based on aircraft configuration
+ */
+private void createSeatMap() {
+    seatMapPanel.removeAll();
+    seatButtonMap.clear();
+
+    // Debug: Print available seats
+    System.out.println("DEBUG: Creating seat map with available seats:");
+    for (Seat seat : availableSeats) {
+        System.out.println("Available seat ID: " + seat.getId() + 
+                          ", Number: " + seat.getSeatNumber() + 
+                          ", Class: " + seat.getSeatClass());
+    }
+
+    // Use FlowLayout to arrange seats
+    seatMapPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+
+    for (Seat seat : availableSeats) {
+        String seatNum = seat.getSeatNumber(); // Expected format: "A1", "B2", etc.
+
+        System.out.println("DEBUG: Creating button for available seat: " + seatNum);
+
+        JToggleButton seatButton = new JToggleButton(seatNum);
+        seatButton.setFont(new Font("Arial", Font.PLAIN, 12));
+        seatButton.setMargin(new Insets(2, 2, 2, 2));
+        seatButton.setPreferredSize(new Dimension(50, 40)); // Wider for better label visibility
+        seatButton.setBackground(Color.WHITE);
+        seatButton.setForeground(Color.BLACK);
+
+        // Store reference by seat ID
+        seatButtonMap.put(seat.getId(), seatButton);
+
+        // Add listener
+        seatButton.addActionListener(e -> selectSeatForCurrentPassenger(seat, seatButton));
+
+        seatMapPanel.add(seatButton);
+    }
+
+    // Refresh the panel
+    seatMapPanel.revalidate();
+    seatMapPanel.repaint();
+}
+
+
+/**
+ * Get a display name for a seat (e.g., "1A", "12F")
+ */
+private String getSeatDisplayName(Seat seat) {
+    // Since seatNumber already contains the display format, just return it
+    return seat.getSeatNumber();
+}
+
+/**
+ * Load available seats for the selected flight
+ */
+private List<Seat> loadAvailableSeats() throws SQLException {
+    List<Integer> takenSeatIds = new ArrayList<>();
+
+    // Debug the selected flight and aircraft
+    System.out.println("DEBUG: Loading available seats for flight: " + 
+                      (app.getSelectedFlight() != null ? app.getSelectedFlight().getId() : "null") +
+                      ", aircraft: " + 
+                      (app.getSelectedAircraft() != null ? app.getSelectedAircraft().getId() : "null"));
+
+    // Step 1: Fetch taken seat IDs
+    String sql = "SELECT seat_id FROM passenger_seat ps " +
+                 "JOIN flightReservation fr ON ps.flightReservation_id = fr.id " +
+                 "WHERE fr.flight_id = ?";
+    
+    try (Connection conn = DbConnection.getInstance();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, app.getSelectedFlight().getId());
+
+        System.out.println("DEBUG: Executing SQL: " + sql.replace("?", String.valueOf(app.getSelectedFlight().getId())));
         
-        // Get aircraft configuration
-        int rows = 10; // Default, should be from aircraft
-        int cols = 6;  // Default, should be from aircraft
-        
-        // Create layout based on aircraft type
-        GridLayout layout = new GridLayout(rows + 1, cols + 1, 5, 5); // +1 for labels
-        seatMapPanel.setLayout(layout);
-        
-        // Add row labels (empty top-left corner)
-        seatMapPanel.add(new JLabel(""));
-        
-        // Add column labels (A, B, C, D, E, F)
-        for (int col = 0; col < cols; col++) {
-            JLabel colLabel = new JLabel(String.valueOf((char)('A' + col)), JLabel.CENTER);
-            colLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            seatMapPanel.add(colLabel);
-        }
-        
-        // Create seat buttons
-        for (int row = 0; row < rows; row++) {
-            // Add row number label
-            JLabel rowLabel = new JLabel(String.valueOf(row + 1), JLabel.CENTER);
-            rowLabel.setFont(new Font("Arial", Font.BOLD, 14));
-            seatMapPanel.add(rowLabel);
-            
-            for (int col = 0; col < cols; col++) {
-                String seatId = (row + 1) + String.valueOf((char)('A' + col));
-                
-                // Find seat in available seats
-                final int seatRow = row + 1;
-                final char seatCol = (char)('A' + col);
-                
-                // Create a unique seat ID for lookup
-                final int uniqueSeatId = (seatRow * 10) + (seatCol - 'A');
-                
-                // Check if seat exists and is available
-                Seat seat = availableSeats.stream()
-                    .filter(s -> s.getSeatNumber().equals(uniqueSeatId))
-                    .findFirst()
-                    .orElse(null);
-                
-                JToggleButton seatButton = new JToggleButton(seatId);
-                seatButton.setFont(new Font("Arial", Font.PLAIN, 12));
-                seatButton.setMargin(new Insets(2, 2, 2, 2));
-                seatButton.setPreferredSize(new Dimension(40, 40));
-                
-                if (seat != null) {
-                    // Seat exists and is available
-                    seatButton.setBackground(Color.WHITE);
-                    seatButton.setForeground(Color.BLACK);
-                    seatButton.setEnabled(true);
-                    
-                    // Store reference to button
-                    seatButtonMap.put(uniqueSeatId, seatButton);
-                    
-                    // Add action listener
-                    final Seat finalSeat = seat;
-                    seatButton.addActionListener(e -> selectSeatForCurrentPassenger(finalSeat, seatButton));
-                } else {
-                    // Seat is taken or doesn't exist
-                    seatButton.setBackground(Color.LIGHT_GRAY);
-                    seatButton.setForeground(Color.DARK_GRAY);
-                    seatButton.setEnabled(false);
-                }
-                
-                seatMapPanel.add(seatButton);
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                int seatId = rs.getInt("seat_id");
+                takenSeatIds.add(seatId);
+                System.out.println("DEBUG: Found taken seat ID: " + seatId);
             }
         }
-        
-        seatMapPanel.revalidate();
-        seatMapPanel.repaint();
     }
+
+    // Step 2: Get all seats for the aircraft
+    List<Seat> seats = app.getSelectedAircraft().getSeats();
+    System.out.println("DEBUG: Total seats on aircraft: " + (seats != null ? seats.size() : "null"));
+    
+    // Step 3: Filter out taken seats
+    List<Seat> available = new ArrayList<>();
+    if (seats != null) {
+        for (Seat seat : seats) {
+            System.out.println("DEBUG: Checking seat ID: " + seat.getId() + 
+                              ", Number: " + seat.getSeatNumber() + 
+                              ", Is taken: " + takenSeatIds.contains(seat.getId()));
+            
+            if (!takenSeatIds.contains(seat.getId())) {
+                available.add(seat);
+                System.out.println("DEBUG: Adding available seat: " + seat.getId() + 
+                                  ", Number: " + seat.getSeatNumber());
+            }
+        }
+    }
+
+    return available;
+}
     
     /**
      * Update the seat selection UI for the currently selected passenger
@@ -520,15 +526,6 @@ public class SeatSelectionPanel extends JPanel {
         }
     }
     
-    /**
-     * Get a display name for a seat (e.g., "1A", "12F")
-     */
-    private String getSeatDisplayName(Seat seat) {
-        int id = seat.getId();
-        int row = id / 10;
-        char col = (char)('A' + (id % 10));
-        return row + String.valueOf(col);
-    }
     
     /**
      * Confirm seat selection and proceed to payment

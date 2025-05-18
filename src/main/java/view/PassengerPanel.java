@@ -12,7 +12,6 @@ public class PassengerPanel extends JPanel {
     private FlightBookingApp parent;
     private Flight selectedFlight;
     private int passengerCount;
-    private SeatClass selectedSeatClass;
     private ArrayList<PassengerForm> passengerForms;
     
     public PassengerPanel(FlightBookingApp parent) {
@@ -75,10 +74,9 @@ public class PassengerPanel extends JPanel {
         return panel;
     }
     
-    public void displayPassengerForms(Flight flight, int passengerCount, SeatClass seatClass) {
+    public void displayPassengerForms(Flight flight, int passengerCount) {
         this.selectedFlight = flight;
         this.passengerCount = passengerCount;
-        this.selectedSeatClass = seatClass;
         
         // Update summary panel
         updateSummaryPanel();
@@ -131,8 +129,7 @@ public class PassengerPanel extends JPanel {
                         
                         // Class and passenger count
                         JLabel classInfoLabel = new JLabel(String.format(
-                            "%s Class, %d Passenger%s", 
-                            selectedSeatClass.toString(),
+                            "%d Passenger%s", 
                             passengerCount,
                             passengerCount > 1 ? "s" : ""
                         ));
@@ -174,29 +171,20 @@ public class PassengerPanel extends JPanel {
             return;
         }
         // Create passenger objects
-                try {
+               
                     ArrayList<Passenger> passengers = new ArrayList<>();
         for (PassengerForm form : passengerForms) {
             Passenger passenger = new Passenger(
                 form.getFullName(),
                 form.getPassportNumber()
             );
-            passenger.setUserId(parent.getCurrentUser().getId());
-            passenger.setFlightReservationId(parent.getSelectedFlight().getId());
-            passenger.save();
             passengers.add(passenger);
-        }
         parent.setPassengers(passengers);
         JOptionPane.showMessageDialog(this, 
                 "Passenger information saved successfully.", 
                 "Information Saved", 
                 JOptionPane.INFORMATION_MESSAGE);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    JOptionPane.showMessageDialog(this, 
-                "falied save passenger"+e.getMessage(), 
-                "Error", 
-                JOptionPane.ERROR_MESSAGE);
+        
             };
        
     }

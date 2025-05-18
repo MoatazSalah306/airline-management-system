@@ -25,7 +25,6 @@ public class SearchPanel extends JPanel {
     private JComboBox<Airport> airportToCombo;
     private JSpinner dateSpinner;
     private JSpinner passengerCountSpinner;
-    private JComboBox<SeatClass> classCombo;
     private JButton searchButton;
     
     // Data Lists
@@ -200,16 +199,8 @@ public class SearchPanel extends JPanel {
         gbc.gridy = 7;
         formPanel.add(passengerCountSpinner, gbc);
         
-        // Class
-        JLabel classLabel = new JLabel("Class:");
-        gbc.gridx = 0;
-        gbc.gridy = 8;
-        formPanel.add(classLabel, gbc);
         
-        classCombo = new JComboBox<>(SeatClass.values());
-        gbc.gridx = 1;
-        gbc.gridy = 8;
-        formPanel.add(classCombo, gbc);
+      
         
         return formPanel;
     }
@@ -224,7 +215,7 @@ public class SearchPanel extends JPanel {
         
         searchButton = new JButton("Search Flights");
         searchButton.setBackground(FlightBookingApp.PRIMARY_COLOR);
-        searchButton.setForeground(FlightBookingApp.WHITE);
+        searchButton.setForeground(Color.black);
         searchButton.setFont(FlightBookingApp.REGULAR_FONT);
         searchButton.setFocusPainted(false);
         searchButton.addActionListener(e -> searchFlights());
@@ -318,8 +309,6 @@ public class SearchPanel extends JPanel {
         int passengerCount = (Integer) passengerCountSpinner.getValue();
         app.setPassengers(new ArrayList<>(passengerCount));
         
-        SeatClass selectedClass = (SeatClass) classCombo.getSelectedItem();
-        // Store selectedClass if needed for seat selection
         
         app.navigateTo("results");
     }
@@ -343,7 +332,4 @@ public class SearchPanel extends JPanel {
         return (Integer) passengerCountSpinner.getValue();
     }
     
-    public SeatClass getSelectedClass() {
-        return (SeatClass) classCombo.getSelectedItem();
-    }
 }
