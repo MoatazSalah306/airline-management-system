@@ -44,7 +44,7 @@ public class LoginPage extends JFrame {
         // Title
         JLabel titleLabel = new JLabel("SkyJourney Airlines", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setForeground(Color.BLACK);
         panel.add(titleLabel, BorderLayout.NORTH);
 
         // Form panel
@@ -58,14 +58,14 @@ public class LoginPage extends JFrame {
         // Password
         JPanel passwordPanel = createFieldPanel("Password:", passwordField = new JPasswordField(20));
         
-        // Remember me checkbox
-        JPanel rememberPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        rememberPanel.setOpaque(false);
-        rememberMeCheckbox = new JCheckBox("Remember me");
-        rememberMeCheckbox.setFont(new Font("Arial", Font.PLAIN, 14));
-        rememberMeCheckbox.setForeground(Color.WHITE);
-        rememberMeCheckbox.setOpaque(false);
-        rememberPanel.add(rememberMeCheckbox);
+        // // Remember me checkbox
+        // JPanel rememberPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        // rememberPanel.setOpaque(false);
+        // rememberMeCheckbox = new JCheckBox("Remember me");
+        // rememberMeCheckbox.setFont(new Font("Arial", Font.PLAIN, 14));
+        // rememberMeCheckbox.setForeground(Color.WHITE);
+        // rememberMeCheckbox.setOpaque(false);
+        // rememberPanel.add(rememberMeCheckbox);
 
         // Buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
@@ -77,7 +77,7 @@ public class LoginPage extends JFrame {
 
         JButton registerButton = new JButton("Register");
         styleButton(registerButton, new Color(70, 130, 180)); // Steel blue
-        registerButton.addActionListener(e -> {
+        registerButton.addActionListener(_ -> {
             dispose();
             new RegisterPage();
         });
@@ -85,31 +85,31 @@ public class LoginPage extends JFrame {
         buttonPanel.add(loginButton);
         buttonPanel.add(registerButton);
 
-        // Forgot Password
-        JLabel forgotPasswordLabel = new JLabel("Forgot Password?");
-        forgotPasswordLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        forgotPasswordLabel.setForeground(Color.WHITE);
-        forgotPasswordLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        forgotPasswordLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                handleForgotPassword();
-            }
+        // // Forgot Password
+        // JLabel forgotPasswordLabel = new JLabel("Forgot Password?");
+        // forgotPasswordLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        // forgotPasswordLabel.setForeground(Color.WHITE);
+        // forgotPasswordLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        // forgotPasswordLabel.addMouseListener(new MouseAdapter() {
+        //     @Override
+        //     public void mouseClicked(MouseEvent e) {
+        //         handleForgotPassword();
+        //     }
             
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                forgotPasswordLabel.setText("<html><u>Forgot Password?</u></html>");
-            }
+        //     @Override
+        //     public void mouseEntered(MouseEvent e) {
+        //         forgotPasswordLabel.setText("<html><u>Forgot Password?</u></html>");
+        //     }
             
-            @Override
-            public void mouseExited(MouseEvent e) {
-                forgotPasswordLabel.setText("Forgot Password?");
-            }
-        });
+        //     @Override
+        //     public void mouseExited(MouseEvent e) {
+        //         forgotPasswordLabel.setText("Forgot Password?");
+        //     }
+        // });
         
-        JPanel forgotPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        forgotPanel.setOpaque(false);
-        forgotPanel.add(forgotPasswordLabel);
+        // JPanel forgotPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        // forgotPanel.setOpaque(false);
+        // forgotPanel.add(forgotPasswordLabel);
 
         // Add components to form panel
         formPanel.add(Box.createRigidArea(new Dimension(0, 30)));
@@ -117,11 +117,11 @@ public class LoginPage extends JFrame {
         formPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         formPanel.add(passwordPanel);
         formPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        formPanel.add(rememberPanel);
+        // formPanel.add(rememberPanel);
         formPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         formPanel.add(buttonPanel);
-        formPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-        formPanel.add(forgotPanel);
+        // formPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        // formPanel.add(forgotPanel);
 
         panel.add(formPanel, BorderLayout.CENTER);
         
@@ -130,6 +130,7 @@ public class LoginPage extends JFrame {
         footerPanel.setOpaque(false);
         JLabel footerLabel = new JLabel("© 2025 SkyJourney Airlines - Secure Login");
         footerLabel.setForeground(new Color(200, 200, 200));
+        footerLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
         footerLabel.setFont(new Font("Arial", Font.ITALIC, 12));
         footerPanel.add(footerLabel);
         panel.add(footerPanel, BorderLayout.SOUTH);
@@ -160,7 +161,7 @@ public class LoginPage extends JFrame {
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
-        button.setPreferredSize(new Dimension(120, 35));
+        button.setPreferredSize(new Dimension(120, 25));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
     
