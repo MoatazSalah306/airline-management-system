@@ -1,8 +1,7 @@
 package view;
 
 import javax.swing.*;
-import java.awt.*;
-import model.User;
+
 
 /**
  * Main class to start the Flight Booking Application
