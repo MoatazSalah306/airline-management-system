@@ -6,8 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 import util.*;
-
 public class Aircraft {
     private int id;
     private int airlineId;
@@ -21,21 +21,6 @@ public class Aircraft {
         this.seats = new ArrayList<>();
     }
 
-
-    public static Aircraft loadByModel(String model) throws SQLException {
-    String sql = "SELECT * FROM aircraft WHERE model = ?";
-    try (Connection conn = DbConnection.getInstance();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setString(1, model);
-        try (ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                return new Aircraft(rs.getString("model"), rs.getInt("manufacturingYear"));
-            }
-            throw new SQLException("Aircraft not found");
-        }
-    }
-}
-
     public void save(int airlineId) throws SQLException {
         this.airlineId = airlineId;
         String sql = "INSERT INTO aircraft (airline_id, model, manufacturing_year) VALUES (?, ?, ?)";
@@ -46,7 +31,7 @@ public class Aircraft {
             stmt.setObject(3, manufacturingYear);
             stmt.executeUpdate();
             try (ResultSet rs = stmt.getGeneratedKeys()) {
-                if (rs.next()) { // move the cursor across the returned rows
+                if (rs.next()) {
                     this.id = rs.getInt(1);
                 }
             }

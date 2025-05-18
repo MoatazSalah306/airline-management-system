@@ -1,6 +1,5 @@
-CREATE DATABASE flights;
-
-use flights;
+CREATE DATABASE IF NOT EXISTS flights;
+USE flights;
 
 -- Table: country
 CREATE TABLE country (
@@ -41,7 +40,7 @@ CREATE TABLE user (
     phone TEXT,
     password TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NULL DEFAULT NULL,
+    updated_at TIMESTAMP,
     age INTEGER,
     role_id INTEGER NOT NULL,
     FOREIGN KEY (role_id) REFERENCES role(id)
@@ -95,7 +94,7 @@ CREATE TABLE payment (
     payment_state TEXT NOT NULL,
     payment_method TEXT NOT NULL,
     payment_date DATE NOT NULL,
-    updated_at TIMESTAMP NULL DEFAULT NULL,
+    updated_at TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user(id)
 );
 
@@ -132,10 +131,9 @@ CREATE TABLE passenger (
 );
 
 -- Junction Table: flight_payment
-CREATE TABLE reservation_payment (
+CREATE TABLE peservation_payment (
     flightReservation_id INTEGER,
     payment_id INTEGER,
-    flight_id INTEGER,
     PRIMARY KEY (flight_id, payment_id),
     FOREIGN KEY (flight_id) REFERENCES flightReservation(id),
     FOREIGN KEY (payment_id) REFERENCES payment(id)

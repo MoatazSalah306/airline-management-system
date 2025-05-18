@@ -61,7 +61,7 @@ public class FlightBookingApp extends JFrame {
     private PassengerPanel passengerPanel;
     private SeatSelectionPanel seatSelectionPanel;
     private PaymentPanel paymentPanel;
-    private ConfirmationPanel confirmationPanel;
+    // private ConfirmationPanel confirmationPanel;
     private FlightHistoryPanel flightHistoryPanel;
     private UserProfilePanel userProfilePanel;
     
@@ -185,7 +185,7 @@ public class FlightBookingApp extends JFrame {
         passengerPanel = new PassengerPanel(this);
         seatSelectionPanel = new SeatSelectionPanel(this);
         paymentPanel = new PaymentPanel(this);
-        confirmationPanel = new ConfirmationPanel(this);
+        // confirmationPanel = new ConfirmationPanel(this);
         flightHistoryPanel = new FlightHistoryPanel(this);
         userProfilePanel = new UserProfilePanel(this);
         
@@ -195,7 +195,7 @@ public class FlightBookingApp extends JFrame {
         mainPanel.add(passengerPanel, "passengers");
         mainPanel.add(seatSelectionPanel, "seatSelection");
         mainPanel.add(paymentPanel, "payment");
-        mainPanel.add(confirmationPanel, "confirmation");
+        // mainPanel.add(confirmationPanel, "confirmation");
         mainPanel.add(flightHistoryPanel, "history");
         mainPanel.add(userProfilePanel, "profile");
     }

@@ -40,7 +40,7 @@ public class Seat {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    Seat seat = new Seat(SeatClass.valueOf(rs.getString("class")),"A40");
+                    Seat seat = new Seat(SeatClass.valueOf(rs.getString("class")),rs.getString("seat_number"));
                     seat.setId(id);
                     seat.setAircraftId(rs.getInt("aircraft_id"));
                     return seat;

@@ -80,21 +80,6 @@ public class Flight {
         }
     }
     
-public static List<Integer> getAllFlightIds() throws SQLException {
-    List<Integer> ids = new ArrayList<>();
-    String sql = "SELECT id FROM flight";
-    
-    try (Connection conn = DbConnection.getInstance();
-         PreparedStatement stmt = conn.prepareStatement(sql);
-         ResultSet rs = stmt.executeQuery()) {
-        
-        while (rs.next()) {
-            ids.add(rs.getInt("id"));
-        }
-    }
-    
-    return ids;
-}
 
 
     public ArrayList<CustomSchedule> getCustomSchedules() throws SQLException {

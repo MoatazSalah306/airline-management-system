@@ -34,7 +34,7 @@ public class ResultsPanel extends JPanel {
         headerPanel.add(headerLabel, BorderLayout.WEST);
     
         JButton backButton = new JButton("New Search");
-        backButton.addActionListener(_ -> parent.navigateTo("search"));
+        backButton.addActionListener(e -> parent.navigateTo("search"));
         headerPanel.add(backButton, BorderLayout.EAST);
     
         add(headerPanel, BorderLayout.NORTH);
@@ -145,8 +145,7 @@ public class ResultsPanel extends JPanel {
                     searchPanel.getFrom(),
                     searchPanel.getTo(),
                     formattedDate,
-                    searchPanel.getPassengerCount(),
-                    searchPanel.getSelectedClass().toString()
+                    searchPanel.getPassengerCount()
                 ));
                 summaryLabel.setFont(new Font("Arial", Font.PLAIN, 14));
                 
@@ -245,7 +244,7 @@ public class ResultsPanel extends JPanel {
             // Select button
             JButton selectButton = new JButton("Select");
             selectButton.setBackground(FlightBookingApp.PRIMARY_COLOR);
-            selectButton.setForeground(Color.WHITE);
+            selectButton.setForeground(Color.BLACK);
             selectButton.setFocusPainted(false);
             selectButton.addActionListener(e -> selectFlight(flight, aircraft));
             actionPanel.add(selectButton, BorderLayout.SOUTH);
@@ -281,8 +280,7 @@ public class ResultsPanel extends JPanel {
             if (component instanceof PassengerPanel) {
                 ((PassengerPanel) component).displayPassengerForms(
                     flight, 
-                    passengerCount, 
-                    searchPanel.getSelectedClass()
+                    passengerCount
                 );
                 break;
             }
