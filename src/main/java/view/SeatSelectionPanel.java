@@ -203,7 +203,7 @@ public class SeatSelectionPanel extends JPanel {
         JButton confirmButton = new JButton("Confirm and Continue");
         confirmButton.setFont(new Font("Arial", Font.BOLD, 14));
         confirmButton.setBackground(FlightBookingApp.PRIMARY_COLOR);
-        confirmButton.setForeground(Color.WHITE);
+        confirmButton.setForeground(Color.BLACK);
         confirmButton.setFocusPainted(false);
         confirmButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         confirmButton.addActionListener(e -> confirmSeatSelection());

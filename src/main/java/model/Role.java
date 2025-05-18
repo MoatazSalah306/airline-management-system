@@ -4,9 +4,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import util.DbConnection;
 
-/**
- * Role model class for user roles
- */
+
 public class Role {
     private int id;
     private String roleName;
@@ -22,6 +20,10 @@ public class Role {
         this.roleName = roleName;
         this.description = description;
     }
+
+    public Role(String roleName) {
+        this.roleName = roleName;
+    }
     
     public void save() throws SQLException {
         String sql = "INSERT INTO role (role_name, description) VALUES (?, ?)";
@@ -29,7 +31,9 @@ public class Role {
              PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             
             stmt.setString(1, roleName);
-            stmt.setString(2, description);
+            // stmt.setString(2, !description.isEmpty()?description:null);
+            stmt.setString(2, (description != null && !description.isEmpty()) ? description : null);
+
             stmt.executeUpdate();
             
             try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -40,6 +44,23 @@ public class Role {
         }
     }
     
+    
+    public static Role loadByName(String roleName) throws SQLException {
+        String sql = "SELECT id, role_name FROM role WHERE role_name = ?";
+        try (Connection conn = DbConnection.getInstance();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             
+            stmt.setString(1, roleName);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String name = rs.getString("role_name");
+                    return new Role(name);
+                } else {
+                    return null; // Role not found
+                }
+            }
+        }
+    }
     public static Role load(int id) throws SQLException {
         String sql = "SELECT * FROM role WHERE id = ?";
         try (Connection conn = DbConnection.getInstance();

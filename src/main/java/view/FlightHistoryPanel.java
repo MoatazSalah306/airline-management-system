@@ -95,7 +95,8 @@ public class FlightHistoryPanel extends JPanel {
     public void loadUserBookings() {
         try {
             // Get user's reservations
-            ArrayList<FlightReservation> reservations = currentUser.getReservations();
+        System.out.println("moataz");
+            ArrayList<FlightReservation> reservations = User.loadWithId(currentUser.getId()).getReservations();
             
             // Create table model
             String[] columns = {"Booking ID", "Flight", "Date", "Status", "Actions"};

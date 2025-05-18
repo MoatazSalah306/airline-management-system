@@ -243,14 +243,6 @@ public class FlightBookingApp extends JFrame {
         currentReservation.setUserId(currentUser.getId());
         currentReservation.setQrCode(generateQrCode());
         currentReservation.save();
-        
-        for (int i = 0; i < passengers.size(); i++) {
-            Passenger passenger = passengers.get(i);
-            passenger.setFlightReservationId(currentReservation.getId());
-            passenger.save();
-            Seat seat = selectedSeats.get(i);
-            currentReservation.addPassengerSeat(passenger, seat);
-        }
         currentReservation.makeReservation();
     }
     
@@ -288,13 +280,8 @@ public class FlightBookingApp extends JFrame {
     public void setSelectedAircraft(Aircraft aircraft) { this.selectedAircraft = aircraft; }
     public WeeklySchedule getSelectedSchedule() { return selectedSchedule; }
     public void setSelectedSchedule(WeeklySchedule schedule) { this.selectedSchedule = schedule; }
-    public ArrayList<Passenger> getPassengers() {
-        System.out.println("getPassengers() called, passenger count: " + passengers.size());
-        for (int i = 0; i < passengers.size(); i++) {
-            System.out.println("Passenger " + (i + 1) + ": " + passengers.get(i).getName());
-        }
-        return passengers;
-    }    public void setPassengers(ArrayList<Passenger> passengers) { this.passengers = passengers; }
+    public ArrayList<Passenger> getPassengers() {return passengers;}    
+    public void setPassengers(ArrayList<Passenger> passengers) { this.passengers = passengers; }
     public ArrayList<Seat> getSelectedSeats() { return selectedSeats; }
     public void setSelectedSeats(ArrayList<Seat> seats) { this.selectedSeats = seats; }
     public int getNumberOfPassengers() { return passengers.size(); }

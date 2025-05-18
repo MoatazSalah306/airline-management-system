@@ -338,7 +338,7 @@ public class PaymentPanel extends JPanel {
                 panel.add(totalAmountLabel);
                 
                 // Store total for payment processing
-                totalAmount=total;
+                this.totalAmount=total;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -369,6 +369,7 @@ public class PaymentPanel extends JPanel {
             
             // Add passengers and seats
             for (int i = 0; i < app.getPassengers().size(); i++) {
+                System.out.print(app.getPassengers().size());
                 Passenger passenger = app.getPassengers().get(i);
                 Seat seat = app.getSelectedSeats().get(i);
                 
@@ -384,7 +385,6 @@ public class PaymentPanel extends JPanel {
             Payment payment = new Payment(totalAmount,(PaymentMethod) paymentMethodCombo.getSelectedItem(),new java.sql.Date(System.currentTimeMillis()));
             payment.setUserId(app.getCurrentUser().getId());
             payment.setPaymentState(PaymentStatus.COMPLETED);
-            payment.setPaymentAmount(totalAmount);
             // Save payment
             payment.save();
             

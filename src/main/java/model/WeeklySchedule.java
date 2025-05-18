@@ -20,13 +20,19 @@ public class WeeklySchedule {
         this.customDate = customDate;
     }
 
+    public WeeklySchedule(DayOfWeek dayOfWeek, Time departureTime) {
+        this.dayOfWeek = dayOfWeek;
+        this.departureTime = departureTime;
+    }
+
     public void save() throws SQLException {
         String sql = "INSERT INTO weeklySchedule (dayOfWeek, departure_time, customDate) VALUES (?, ?, ?)";
         try (Connection conn = DbConnection.getInstance();
              PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, dayOfWeek.name());
             stmt.setTime(2, departureTime);
-            stmt.setDate(3, customDate);
+            stmt.setDate(3, customDate != null ? customDate : null);
+
             stmt.executeUpdate();
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {

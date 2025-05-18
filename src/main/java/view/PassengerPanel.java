@@ -171,8 +171,7 @@ public class PassengerPanel extends JPanel {
             return;
         }
         // Create passenger objects
-               
-                    ArrayList<Passenger> passengers = new ArrayList<>();
+        ArrayList<Passenger> passengers = new ArrayList<>();
         for (PassengerForm form : passengerForms) {
             Passenger passenger = new Passenger(
                 form.getFullName(),

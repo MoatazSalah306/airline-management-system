@@ -64,7 +64,7 @@ public class UserProfilePanel extends JPanel {
         
         JButton saveButton = new JButton("Save Changes");
         saveButton.setBackground(FlightBookingApp.PRIMARY_COLOR);
-        saveButton.setForeground(Color.WHITE);
+        saveButton.setForeground(Color.BLACK);
         saveButton.addActionListener(e -> saveUserData());
         
         controlPanel.add(backButton);
@@ -227,7 +227,7 @@ public class UserProfilePanel extends JPanel {
             }
             
             // Save changes to database
-            currentUser.save();
+            currentUser.update(currentUser.getUsername(),currentUser.getEmail(),currentUser.getPhone(),currentUser.getAge());
             
             JOptionPane.showMessageDialog(this, 
                 "Profile updated successfully.", 

@@ -44,7 +44,7 @@ public class LoginPage extends JFrame {
         // Title
         JLabel titleLabel = new JLabel("SkyJourney Airlines", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setForeground(Color.BLACK);
+        titleLabel.setForeground(Color.WHITE);
         panel.add(titleLabel, BorderLayout.NORTH);
 
         // Form panel
