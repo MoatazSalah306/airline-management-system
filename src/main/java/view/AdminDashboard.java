@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.util.*;
+import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -29,12 +30,9 @@ public class AdminDashboard extends JFrame {
     private JPanel systemConfigPanel;
     private JPanel airlineManagementPanel;
 
-
     // Tables
     private JTable usersTable;
     private JTable flightsTable;
-
-    
 
     public AdminDashboard(User user) {
         this.currentUser = user;
@@ -216,9 +214,8 @@ public class AdminDashboard extends JFrame {
     private JPanel createDashboardPanel() {
 
         dashboardPanel = new JPanel(new BorderLayout(10, 10));
-JPanel panel = dashboardPanel;
+        JPanel panel = dashboardPanel;
 
-        
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
         panel.setBackground(Color.WHITE);
 
@@ -244,8 +241,6 @@ JPanel panel = dashboardPanel;
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(Color.WHITE);
         centerPanel.add(contentPanel, BorderLayout.NORTH);
-
-        
 
         panel.add(centerPanel, BorderLayout.CENTER);
 
@@ -1069,22 +1064,22 @@ JPanel panel = dashboardPanel;
     }
 
     // Data loading methods
-  private void loadDashboardData() {
-    Container container = getContentPane(); // or mainFrame.getContentPane()
+    private void loadDashboardData() {
+        Container container = getContentPane(); // or mainFrame.getContentPane()
 
-    // Remove the old panel
-    container.remove(dashboardPanel);
+        // Remove the old panel
+        container.remove(dashboardPanel);
 
-    // Create a new one with fresh data
-    dashboardPanel = createDashboardPanel();
+        // Create a new one with fresh data
+        dashboardPanel = createDashboardPanel();
 
-    // Add the new one back
-    container.add(dashboardPanel, BorderLayout.CENTER);
+        // Add the new one back
+        container.add(dashboardPanel, BorderLayout.CENTER);
 
-    // Refresh the UI
-    container.revalidate();
-    container.repaint();
-}
+        // Refresh the UI
+        container.revalidate();
+        container.repaint();
+    }
 
     private void loadUsers() {
         String sql = """
@@ -1190,9 +1185,12 @@ JPanel panel = dashboardPanel;
         JPasswordField passwordField = new JPasswordField(20);
         JPasswordField confirmPasswordField = new JPasswordField(20);
         JTextField ageField = new JTextField(20);
-        JComboBox<String> roleCombo = new JComboBox<>(new String[] {
-                "User", "Admin"
-        });
+
+        // Create a JComboBox with Role objects instead of Strings
+        JComboBox<Role> roleCombo = new JComboBox<>();
+
+        // Load roles from database
+        loadRolesIntoComboBox(roleCombo);
 
         panel.add(createDialogField("Username:", usernameField));
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -1222,7 +1220,7 @@ JPanel panel = dashboardPanel;
             String password = new String(passwordField.getPassword());
             String confirmPassword = new String(confirmPasswordField.getPassword());
             String ageText = ageField.getText().trim();
-            String selectedRoleName = (String) roleCombo.getSelectedItem();
+            Role selectedRole = (Role) roleCombo.getSelectedItem();
 
             // Validate inputs
             if (username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()
@@ -1252,19 +1250,13 @@ JPanel panel = dashboardPanel;
                     return;
                 }
 
-                // Load or create role
-                Role selectedRole = Role.loadByName(selectedRoleName);
+                // Validate selected role
                 if (selectedRole == null) {
-                    selectedRole = new Role(selectedRoleName);
-                    selectedRole.save(); // Sets role ID
-                }
-
-                if (selectedRole == null || selectedRole.getId() <= 0) {
-                    showError("Error: Role could not be created or retrieved.");
+                    showError("Please select a role.");
                     return;
                 }
 
-                // Register new user
+                // Register new user with the selected role
                 User newUser = new User(username, email, phone, password, age, selectedRole);
                 newUser.register();
 
@@ -1286,6 +1278,43 @@ JPanel panel = dashboardPanel;
 
         dialog.add(panel);
         dialog.setVisible(true);
+    }
+
+
+    private void loadRolesIntoComboBox(JComboBox<Role> comboBox) {
+        try {
+            // Clear any existing items
+            comboBox.removeAllItems();
+
+            // Get all roles from database
+            List<Role> roles = Role.loadAll();
+
+            // Add each role to the combo box
+            for (Role role : roles) {
+                comboBox.addItem(role);
+            }
+
+            // Select the first role by default if available
+            if (comboBox.getItemCount() > 0) {
+                comboBox.setSelectedIndex(0);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            showError("Failed to load roles: " + ex.getMessage());
+
+            // Add default roles as fallback
+            try {
+                Role userRole = new Role("User");
+                userRole.setId(1);
+                comboBox.addItem(userRole);
+
+                Role adminRole = new Role("Admin");
+                adminRole.setId(2);
+                comboBox.addItem(adminRole);
+            } catch (Exception e) {
+                // Ignore, this is just a fallback
+            }
+        }
     }
 
     private void showAddFlightDialog() {
@@ -1523,7 +1552,7 @@ JPanel panel = dashboardPanel;
         panel.add(headerLabel, BorderLayout.NORTH);
 
         // Airline table
-        String[] columns = { "ID", "Name", "Code", "Aircraft Count"};
+        String[] columns = { "ID", "Name", "Code", "Aircraft Count" };
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -1607,7 +1636,7 @@ JPanel panel = dashboardPanel;
 
                     model.addRow(new Object[] {
                             id, name, code, aircraftCount,
-                           
+
                     });
                 }
             }

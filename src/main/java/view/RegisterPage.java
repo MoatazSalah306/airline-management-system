@@ -16,7 +16,7 @@ public class RegisterPage extends JFrame {
     private JPasswordField passwordField;
     private JPasswordField confirmPasswordField;
     private JSpinner ageSpinner;
-    private JComboBox<String> roleField;
+    private JComboBox<Role> roleField;  // Changed to use Role objects instead of String
 
 
     public RegisterPage() {
@@ -70,8 +70,10 @@ public class RegisterPage extends JFrame {
         // Confirm Password
         JPanel confirmPanel = createFieldPanel("Confirm:", confirmPasswordField = new JPasswordField(20));
 
-        // user role
-        JPanel rolePanel = createFieldPanel("Role:", roleField = new JComboBox<>(new String[] {"Admin", "User"}));
+        // User role - now loading from database
+        roleField = new JComboBox<>();
+        loadRolesFromDatabase();
+        JPanel rolePanel = createFieldPanel("Role:", roleField);
 
         // Age
         JPanel agePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -140,6 +142,46 @@ public class RegisterPage extends JFrame {
         setVisible(true);
     }
     
+    /**
+     * Loads all roles from the database into the role dropdown
+     */
+    private void loadRolesFromDatabase() {
+        try {
+            // Get all roles from the database
+            java.util.List<Role> roles = Role.loadAll();
+            
+            // Clear existing items
+            roleField.removeAllItems();
+            
+            // Add roles to the combobox
+            for (Role role : roles) {
+                roleField.addItem(role);
+            }
+            
+            // If there are roles, select the first one by default
+            if (roleField.getItemCount() > 0) {
+                roleField.setSelectedIndex(0);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            showError("Failed to load roles: " + ex.getMessage());
+            
+            // Add some default roles as fallback
+            roleField.removeAllItems();
+            try {
+                Role adminRole = new Role("Admin");
+                adminRole.setId(1); // Setting a temporary ID since we're just using this as fallback
+                roleField.addItem(adminRole);
+                
+                Role userRole = new Role("User");
+                userRole.setId(2); // Setting a temporary ID since we're just using this as fallback
+                roleField.addItem(userRole);
+            } catch (Exception e) {
+                // Ignore any errors here as this is just a fallback
+            }
+        }
+    }
+    
     private JPanel createFieldPanel(String labelText, JComponent field) {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel.setOpaque(false);
@@ -169,80 +211,70 @@ public class RegisterPage extends JFrame {
     }
     
     private void handleRegistration() {
-    String username = usernameField.getText().trim();
-    String email = emailField.getText().trim();
-    String phone = phoneField.getText().trim();
-    String password = new String(passwordField.getPassword());
-    String confirmPassword = new String(confirmPasswordField.getPassword());
-    String selectedRoleName = (String) roleField.getSelectedItem();
-    int age = (Integer) ageSpinner.getValue();
+        String username = usernameField.getText().trim();
+        String email = emailField.getText().trim();
+        String phone = phoneField.getText().trim();
+        String password = new String(passwordField.getPassword());
+        String confirmPassword = new String(confirmPasswordField.getPassword());
+        Role selectedRole = (Role) roleField.getSelectedItem();
+        int age = (Integer) ageSpinner.getValue();
 
-    // Validate inputs
-    if (username.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
-        showError("All fields are required");
-        return;
-    }
-
-    if (!password.equals(confirmPassword)) {
-        showError("Passwords do not match");
-        return;
-    }
-
-    if (password.length() < 6) {
-        showError("Password must be at least 6 characters");
-        return;
-    }
-
-    if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-        showError("Invalid email format");
-        return;
-    }
-
-    try {
-        // Check if email already exists
-        try {
-            User existingUser = User.loadWithEmail(email);
-            if (existingUser != null) {
-                showError("Email already registered");
-                return;
-            }
-        } catch (SQLException ex) {
-            // No user found with this email, which is what we want
-        }
-
-        // 1. Check if the role exists; if not, insert it
-        Role selectedRole = Role.loadByName(selectedRoleName); // Try to load role by name
-
-        if (selectedRole == null) {
-            // Role doesn't exist, so create it
-            selectedRole = new Role(selectedRoleName);
-            selectedRole.save();  // Save role to DB, sets the ID in Role instance
-        }
-
-        if (selectedRole == null || selectedRole.getId() == 0) {
-            showError("Error: Role could not be created or retrieved");
+        // Validate inputs
+        if (username.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
+            showError("All fields are required");
             return;
         }
 
-        // 2. Create new user with the role ID
-        User newUser = new User(username, email, phone, password, age, selectedRole);
-        newUser.register();
+        if (!password.equals(confirmPassword)) {
+            showError("Passwords do not match");
+            return;
+        }
 
-        JOptionPane.showMessageDialog(this,
-            "Registration successful! Please log in with your new account.",
-            "Registration Success",
-            JOptionPane.INFORMATION_MESSAGE);
+        if (password.length() < 6) {
+            showError("Password must be at least 6 characters");
+            return;
+        }
 
-        // Return to login page
-        dispose();
-        new LoginPage();
+        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            showError("Invalid email format");
+            return;
+        }
 
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-        showError("Registration failed: " + ex.getMessage());
+        try {
+            // Check if email already exists
+            try {
+                User existingUser = User.loadWithEmail(email);
+                if (existingUser != null) {
+                    showError("Email already registered");
+                    return;
+                }
+            } catch (SQLException ex) {
+                // No user found with this email, which is what we want
+            }
+
+            if (selectedRole == null) {
+                showError("Please select a role");
+                return;
+            }
+
+            // Create new user with the selected role
+            User newUser = new User(username, email, phone, password, age, selectedRole);
+            newUser.register();
+
+            JOptionPane.showMessageDialog(this,
+                "Registration successful! Please log in with your new account.",
+                "Registration Success",
+                JOptionPane.INFORMATION_MESSAGE);
+
+            // Return to login page
+            dispose();
+            new LoginPage();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            showError("Registration failed: " + ex.getMessage());
+        }
     }
-}
-
   
     private void showError(String message) {
         JOptionPane.showMessageDialog(this, 

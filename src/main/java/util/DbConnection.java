@@ -14,7 +14,7 @@ public class DbConnection {
     // Database configuration
     private static final String DB_URL = "jdbc:mysql://localhost:3306/flights";
     private static final String USER = "root";
-    private static final String PASS = "1234";
+    private static final String PASS = "";
     
     // Maximum number of connection attempts
     private static final int MAX_RETRY_ATTEMPTS = 3;
